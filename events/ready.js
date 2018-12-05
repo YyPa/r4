@@ -18,9 +18,9 @@ console.log('Bot hazır ve giriş yaptı.')
 console.log(`${client.guilds.size} Sunucuyu + ${client.users.size} Kullanıcıyı + Senin Küfürlerini İzliyor`);
 
     var Games = [
-
-        "Bize Destek Olmak İçin İninal Barkodumuza Bağış Yapabilirsiniz. Daha Fazla Bilgi İçin; b!bağış",
 		
+	"xR4 Alımlara Açıktır",
+	    
         "🔥 Bot News 🔥 Hesapla Ve Emoji Komutları Gelmiştir",
 		
 		"Botumuz Yeni Ve Gelişmekte Olan Bir Bottur Bize Destek İçin Botumuzu Sunucularınıza Eklemeyi Unutmayın 👍",
