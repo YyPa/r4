@@ -22,8 +22,6 @@ console.log(`${client.guilds.size} Sunucuyu + ${client.users.size} Kullanıcıy�
 	"xR4 Alımlara Açıktır",
 	    
         "🔥 Bot News 🔥 Hesapla Ve Emoji Komutları Gelmiştir",
-		
-		"Botumuz Yeni Ve Gelişmekte Olan Bir Bottur Bize Destek İçin Botumuzu Sunucularınıza Eklemeyi Unutmayın 👍",
 	
      	"Kötü Kelimeleri izliyor",
 		
