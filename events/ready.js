@@ -34,7 +34,7 @@ console.log(`${client.guilds.size} Sunucuyu + ${client.users.size} Kullanıcıy�
 
         var random = Math.floor(Math.random()*(Games.length-0+1)+0);
 
-        client.user.setGame(Games[random], "https://www.twitch.tv/iwallysyt");
+        client.user.setGame(Games[random], "https://www.twitch.tv/rexo_roux");
         }, 2 * 2500);
 
 };
