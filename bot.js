@@ -362,82 +362,39 @@ client.on('message', msg => {
   if (msg.author.bot) return;
 })
 
-
-
-
 client.on("message", async message => {
+    if (message.channel.type === "dm") return;
 
-  if(message.author.bot) return;
-  if(message.channel.type === "dm") return;
+  if (message.author.bot) return;
 
-  let prefixes = JSON.parse(fs.readFileSync("./prefixes.json", "utf8"));
-  if(!prefixes[message.guild.id]){
-    prefixes[message.guild.id] = {
-      prefixes: botconfig.prefix
-    };
+  var user = message.mentions.users.first() || message.author;
+  if (!message.guild) user = message.author;
+
+  if (!points[user.id]) points[user.id] = {
+    points: 0,
+    level: 0,
+  };
+
+  let userData = points[user.id];
+  userData.points++;
+
+  let curLevel = Math.floor(0.1 * Math.sqrt(userData.points));
+  if (curLevel > userData.level) {
+    userData.level = curLevel;
+        var user = message.mentions.users.first() || message.author;
+const level = new Discord.RichEmbed().setColor("RANDOM").setFooter(``).setThumbnail(user.avatarURL)
+message.channel.send(`🆙 **|  ${user.username} Tebrikler! Level atladın**`)
+    }
+
+fs.writeFile('./xp.json', JSON.stringify(points), (err) => {
+    if (err) console.error(err)
+  })
+
+  if (message.content.toLowerCase() === prefix + 'level' || message.content.toLowerCase() === prefix + 'lvl') {
+const level = new Discord.RichEmbed().setTitle(`${user.username}`).setDescription(`**Seviye:** ${userData.level}\n**EXP:** ${userData.points}`).setColor("RANDOM").setFooter(``).setThumbnail(user.avatarURL)
+message.channel.send(`📝 **| ${user.username} Adlı Kullanıcının Profili Burada!**`)
+message.channel.send(level)
   }
-
-  if(!coins[message.author.id]){
-    coins[message.author.id] = {
-      coins: 0
-    };
-  }
-
-  let coinAmt = Math.floor(Math.random() * 15) + 1;
-  let baseAmt = Math.floor(Math.random() * 15) + 1;
-  console.log(`${coinAmt} ; ${baseAmt}`);
-
-  if(coinAmt === baseAmt){
-    coins[message.author.id] = {
-      coins: coins[message.author.id].coins + coinAmt
-    };
-  fs.writeFile("./coins.json", JSON.stringify(coins), (err) => {
-    if (err) console.log(err)
-  });
-  let coinEmbed = new Discord.RichEmbed()
-  .setAuthor(message.author.username)
-  .setColor(RANDOM)
-  .addField("💸", `${coinAmt} para eklendi!`);
-
-  message.channel.send(coinEmbed).then(msg => {msg.delete(5000)});
-  }
-
-  let xpAdd = Math.floor(Math.random() * 7) + 8;
-  console.log(xpAdd);
-
-  if(!xp[message.author.id]){
-    xp[message.author.id] = {
-      xp: 0,
-      level: 1
-    };
-  }
-
-
-  let curxp = xp[message.author.id].xp;
-  let curlvl = xp[message.author.id].level;
-  let nxtLvl = xp[message.author.id].level * 300;
-  xp[message.author.id].xp =  curxp + xpAdd;
-  if(nxtLvl <= xp[message.author.id].xp){
-    xp[message.author.id].level = curlvl + 1;
-    let lvlup = new Discord.RichEmbed()
-    .setTitle("Level Atladın!")
-    .setColor(purple)
-    .addField("Level Atladın", curlvl + 1);
-
-    message.channel.send(lvlup).then(msg => {msg.delete(5000)});
-  }
-  fs.writeFile("./xp.json", JSON.stringify(xp), (err) => {
-    if(err) console.log(err)
-  });
-
-  let prefix = prefixes[message.guild.id].prefixes;
-  let messageArray = message.content.split(" ");
-  let cmd = messageArray[0];
-  let args = messageArray.slice(1);
-
-  let commandfile = bot.commands.get(cmd.slice(prefix.length));
-  if(commandfile) commandfile.run(bot,message,args);
-
 });
 
 client.on('message', msg => {
