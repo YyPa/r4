@@ -9,7 +9,7 @@ exports.run = (client, msg, args) => {
       msg.channel.send({ file: response.body.message });
     });
   } else {
-    msg.channel.send("This isn't NSFW channel!")
+    msg.channel.send("Burası NSFW kanalı değil")
   }
 };
 
