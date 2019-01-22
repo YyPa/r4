@@ -19,9 +19,7 @@ console.log(`${client.guilds.size} Sunucuyu + ${client.users.size} Kullanıcıy�
 
     var Games = [
 		
-	"xR4 Alımlara Açıktır",
-	    
-        "🔥 Bot News 🔥 Hesapla Ve Emoji Komutları Gelmiştir",
+	"R7 Alımlara Açıktır",
 	
      	"Kötü Kelimeleri izliyor",
 		
