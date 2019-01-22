@@ -13,3 +13,15 @@ exports.run = (client, msg, args) => {
   }
 };
 
+exports.conf = {
+  enabled: true,
+  guildOnly: false,
+  aliases: [],
+  permLevel: 0
+};
+
+exports.help = {
+  name: 'pgif',
+  description: 'PGİF',
+  usage: 'pgif'
+};
