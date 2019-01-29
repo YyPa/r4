@@ -3,8 +3,14 @@ const client = new Discord.Client();
 const ayarlar = require('./ayarlar.json');
 const chalk = require('chalk');
 const fs = require('fs');
+const { GOOGLE_API_KEY } = require('./anahtarlar.json');
+const YouTube = require('simple-youtube-api');
+const queue = new Map();  
+const youtube = new YouTube(GOOGLE_API_KEY);
+const ytdl = require('ytdl-core');
 let xp = require("./xp.json");
 const moment = require('moment');
+const antispam = require("discord-anti-spam-tr");
 require('./util/eventLoader')(client);
 
 var prefix = ayarlar.prefix;
@@ -199,38 +205,307 @@ request('https://api.eggsybot.xyz/espri', function (error, response, body) {
     }
 });
 
-client.on("message", msg => {
-        const reklam = ["discordapp", "discord.gg", "discord.tk", "discordbots.org", "https://discordapp.com", "https://discord.gg", "http://discord.gg", "htpp:/discordapp.com", "https://discordbots.org"];
-        if (reklam.some(word => msg.content.includes(word))) {
-          try {
-             if (!msg.member.hasPermission("BAN_MEMBERS")) {
-                  msg.delete();
+client.on("guildMemberAdd", async member => {
+        let sayac = JSON.parse(fs.readFileSync("./otorol.json", "utf8"));
+  let otorole =  JSON.parse(fs.readFileSync("./otorol.json", "utf8"));
+      let arole = otorole[member.guild.id].sayi
+  let giriscikis = JSON.parse(fs.readFileSync("./otorol.json", "utf8"));  
+  let embed = new Discord.RichEmbed()
+    .setTitle('Otorol Sistemi')
+    .setDescription(`:loudspeaker: :inbox_tray:  @${member.user.tag}'a Otorol Verildi `)
+.setColor("GREEN")
+    .setFooter("Gnarge", client.user.avatarURL);
 
-                  return msg.channel.sendEmbed(new Discord.RichEmbed().setDescription('Bu Linki Benden Başkası Görmedi :joy:').setTitle('Maalesef Reklam Yapamadın :joy:').setColor('RANDOM')).then(msg => msg.delete(3000));
-             }              
-          } catch(err) {
-            console.log(err);
-          }
-        }
+  if (!giriscikis[member.guild.id].kanal) {
+    return;
+  }
+
+  try {
+    let giriscikiskanalID = giriscikis[member.guild.id].kanal;
+    let giriscikiskanali = client.guilds.get(member.guild.id).channels.get(giriscikiskanalID);
+    giriscikiskanali.send(`:loudspeaker: :white_check_mark: Hoşgeldin **${member.user.tag}** Rolün Başarıyla Verildi.`);
+  } catch (e) { // eğer hata olursa bu hatayı öğrenmek için hatayı konsola gönderelim.
+    return console.log(e)
+  }
+
+});
+
+client.on("guildMemberAdd", async (member) => {
+      let autorole =  JSON.parse(fs.readFileSync("./otorol.json", "utf8"));
+      let role = autorole[member.guild.id].sayi
+
+      member.addRole(role)
+
+});
+
+client.on('message', async message => {
+  const ms = require('ms');
+  const args = message.content.slice(prefix.length).trim().split(/ +/g);
+  const command = args.shift().toLowerCase();
+  let u = message.mentions.users.first() || message.author;
+  if (command === "sunucu-kur") {
+  if (message.guild.channels.find(channel => channel.name === "Bot Kullanımı")) return message.channel.send(" Bot Paneli Zaten Ayarlanmış.")
+  message.channel.send(`Bot Bilgi Kanallarının kurulumu başlatılsın mı? başlatılacak ise **evet** yazınız.`)
+      if (!message.member.hasPermission('ADMINISTRATOR'))
+  return message.channel.send(" Bu Kodu `Yönetici` Yetkisi Olan Kişi Kullanabilir.");
+      message.channel.awaitMessages(response => response.content === 'evet', {
+        max: 1,
+        time: 10000,
+        errors: ['time'],
+      })
+    .then((collected) => {
+   message.guild.createChannel('|▬▬|ÖNEMLİ KANALLAR|▬▬|', 'category', [{
+  id: message.guild.id,
+  deny: ['SEND_MESSAGES']
+}])
+
+
+   message.guild.createChannel('Talepler', 'category', [{
+  id: message.guild.id,
+  deny: ['SEND_MESSAGES']
+}])
+        
+ message.guild.createChannel('「📃」kurallar', 'text', [{
+  id: message.guild.id,
+  deny: ['SEND_MESSAGES']
+}])
+.then(channel =>
+ channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|ÖNEMLİ KANALLAR|▬▬|")));
+ message.guild.createChannel('「🚪」gelen-giden', 'text', [{
+  id: message.guild.id,
+  deny: ['SEND_MESSAGES']
+}])
+.then(channel =>
+       channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|ÖNEMLİ KANALLAR|▬▬|")));
+       message.guild.createChannel('「✅」sayaç', 'text', [{
+        id: message.guild.id,
+        deny: ['SEND_MESSAGES']
+      }])
+.then(channel =>
+             channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|ÖNEMLİ KANALLAR|▬▬|")));
+             message.guild.createChannel('「💾」log-kanalı', 'text', [{
+              id: message.guild.id,
+              deny: ['SEND_MESSAGES']
+            }])
+            .then(channel => channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|ÖNEMLİ KANALLAR|▬▬|")));
+            message.guild.createChannel('「📢」duyuru-odası', 'text', [{
+              id: message.guild.id,
+              deny: ['SEND_MESSAGES']
+            }])
+.then(channel =>
+ channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|ÖNEMLİ KANALLAR|▬▬|")));
+        message.guild.createChannel('yetki-başvurusu', 'text', [{
+        id: message.guild.id,
+        deny: ['SEND_MESSAGES']
+      }])
+.then(channel =>
+             channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|ÖNEMLİ KANALLAR|▬▬|")));
+
+       }) 
+       .then((collected) => {
+        message.guild.createChannel('|▬▬|GENEL KANALLAR|▬▬|', 'category', [{
+       id: message.guild.id,
+     }]);
+	  message.guild.createChannel(`canlı-destek`)
+	 .then(channel =>
+	 channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|ÖNEMLİ KANALLAR|▬▬|")));
+      message.guild.createChannel(`「💡」şikayet-ve-öneri`, 'text')
+     .then(channel =>
+      channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|GENEL KANALLAR|▬▬|")));
+     message.guild.createChannel(`「👥」pre-arama-odası`, 'text')
+     .then(channel =>
+            channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|GENEL KANALLAR|▬▬|")));
+     message.guild.createChannel(`「📷」görsel-içerik`, 'text')
+     .then(channel =>
+                  channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|GENEL KANALLAR|▬▬|")));
+     message.guild.createChannel(`「🤖」bot-komutları`, 'text')
+     .then(channel =>
+                  channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|GENEL KANALLAR|▬▬|")));
+     message.guild.createChannel(`「💬」sohbet`, 'text')
+     .then(channel =>
+      channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|GENEL KANALLAR|▬▬|")));
+
+      message.guild.createChannel(`🏆》Kurucu Odası`, "voice")
+      .then(channel =>
+        channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|SES KANALLARI|▬▬|")))
+      .then(c => {
+        let role = message.guild.roles.find("name", "@everyone");
+        let role2 = message.guild.roles.find("name", "Kurucu");
+        
+        c.overwritePermissions(role, {
+            CONNECT: false,
+        });
+        c.overwritePermissions(role2, {
+            CONNECT: true,
+            
+        });
+    })
+
+    message.guild.createChannel('|▬▬|SES KANALLARI|▬▬|', 'category', [{
+      id: message.guild.id,
+    }]);
+
+    message.guild.createChannel(`🏆》Yönetici Odası`, "voice")
+    .then(channel =>
+      channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|SES KANALLARI|▬▬|")))
+    .then(c => {
+      let role = message.guild.roles.find("name", "@everyone");
+      let role2 = message.guild.roles.find("name", "Kurucu");
+      let role3 = message.guild.roles.find("name", "Yönetici");
+      c.overwritePermissions(role, {
+          CONNECT: false,
+      });
+      c.overwritePermissions(role2, {
+          CONNECT: true,
+      });
+      c.overwritePermissions(role3, {
+          CONNECT: true,
+      });
+  })
+
+  message.guild.createChannel(`💬》Sohbet Odası`, "voice")
+  .then(channel =>
+    channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|SES KANALLARI|▬▬|")))
+  .then(c => {
+    let role = message.guild.roles.find("name", "@everyone");
+    c.overwritePermissions(role, {
+        CONNECT: true,
     });
-
-client.on("message", async message => {
-    let sayac = JSON.parse(fs.readFileSync("./ayarlar/sayac.json", "utf8"));
-    if(sayac[message.guild.id]) {
-        if(sayac[message.guild.id].sayi <= message.guild.members.size) {
-            const embed = new Discord.RichEmbed()
-                .setDescription(`Tebrikler ${message.guild.name}! Başarıyla ${sayac[message.guild.id].sayi} kullanıcıya ulaştık! Sayaç sıfırlandı!`)
-                .setColor("RANDOM")
-                .setTimestamp()
-            message.channel.send({embed})
-            delete sayac[message.guild.id].sayi;
-            delete sayac[message.guild.id];
-            fs.writeFile("./ayarlar/sayac.json", JSON.stringify(sayac), (err) => {
-                console.log(err)
-            })
-        }
-    }
 })
+
+message.guild.createChannel('|▬▬|OYUN ODALARI|▬▬|', 'category', [{
+  id: message.guild.id,
+}]);
+
+message.guild.createChannel(`🎮》LOL`, 'voice')
+.then(channel =>
+ channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|OYUN ODALARI|▬▬|")))
+ message.guild.createChannel(`🎮》ZULA`, 'voice')
+ .then(channel =>
+  channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|OYUN ODALARI|▬▬|")))
+ message.guild.createChannel(`🎮》COUNTER STRİKE`, 'voice')
+.then(channel =>
+ channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|OYUN ODALARI|▬▬|")))
+ message.guild.createChannel(`🎮》PUBG`, 'voice')
+ .then(channel =>
+  channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|OYUN ODALARI|▬▬|")))
+  message.guild.createChannel(`🎮》FORTNİTE`, 'voice')
+  .then(channel =>
+   channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|OYUN ODALARI|▬▬|")))
+   message.guild.createChannel(`🎮》MİNECRAFT`, 'voice')
+   .then(channel =>
+    channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|OYUN ODALARI|▬▬|")))
+    message.guild.createChannel(`🎮》ROBLOX`, 'voice')
+    .then(channel =>
+     channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|OYUN ODALARI|▬▬|")))
+     message.guild.createChannel(`🎮》WOLFTEAM`, 'voice')
+     .then(channel =>
+      channel.setParent(message.guild.channels.find(channel => channel.name === "|▬▬|OYUN ODALARI|▬▬|")))
+
+
+
+      message.guild.createRole({
+        name: 'Kurucu',
+        color: 'RED',
+        permissions: [
+            "ADMINISTRATOR",
+    ]
+      })
+
+      
+      message.guild.createRole({
+        name: 'Yönetici',
+        color: 'BLUE',
+        permissions: [
+            "MANAGE_GUILD",
+            "MANAGE_ROLES",
+            "MUTE_MEMBERS",
+            "DEAFEN_MEMBERS",
+            "MANAGE_MESSAGES",
+            "MANAGE_NICKNAMES",
+            "KICK_MEMBERS"
+    ]
+      })
+
+      message.guild.createRole({
+        name: 'Moderatör',
+        color: 'GREEN',
+        permissions: [
+            "MANAGE_GUILD",
+            "MANAGE_ROLES",
+            "MUTE_MEMBERS",
+            "DEAFEN_MEMBERS",
+            "MANAGE_MESSAGES",
+            "MANAGE_NICKNAMES"
+    ]
+      })
+
+      message.guild.createRole({
+        name: 'V.I.P',
+        color: '00ffff',
+      })
+
+      message.guild.createRole({
+        name: 'Üye',
+        color: 'WHITE',
+      })
+	  
+	  message.guild.createRole({
+        name: 'Destek',
+        color: '00999ff',
+      })
+
+      message.guild.createRole({
+        name: 'Bot',
+        color: 'ORANGE',
+      })
+
+       message.channel.send("Gerekli Odalar Kuruldu!")
+     
+            })   
+    
+}
+});
+
+antispam(client, {
+  uyarmaSınırı: 4, //Uyarılmadan önce aralıkta gönderilmesine izin verilen maksimum mesaj miktarı.
+  banlamaSınırı: 7, //Yasaklanmadan önce aralıkta gönderilmesine izin verilen maksimum ileti miktar.
+  aralık: 1000, // ms kullanıcılarda zaman miktarı, yasaklanmadan önce aralık değişkeninin maksimumunu gönderebilir.
+  uyarmaMesajı: "Spamı Durdur Yoksa Mutelerim.", // Uyarı mesajı, kullanıcıya hızlı gideceklerini belirten kullanıcıya gönderilir..
+  rolMesajı: "Spam için yasaklandı, başka biri var mı?", //Yasak mesaj, yasaklanmış kullanıcıyı ,Banlar
+  maxSpamUyarı: 8,//Bir kullanıcının uyarılmadan önce bir zaman dilimi içinde gönderebileceği maksimum kopya sayısı
+  maxSpamBan: 12, //Bir kullanıcının yasaklanmadan önce bir zaman diliminde gönderebildiği maksimum kopya sayısı
+  zaman: 7, // Spamdan sonraki zaman
+  rolİsimi: "spam-susturulmuş" // Spam Atan Kullanıcılar Verilecek Röl
+});
+
+const girismesaj = [
+  '**Cait Army sunucunuza eklendi!**',
+  '**Cait Army** sunucunuzdaki insanlara kolaylıklar sağlar.',
+  'Botumuzun özelliklerini öğrenmek için !yardım komutunu kullanabilirsin.',
+  '**ÖNEMLİ:** Botun kullanması için mod-log kanalı açın ve deneme için',
+  'birine ban atın ya da bir banlı kişinin banını kaldırın.',
+  '',
+]
+
+client.on('guildCreate', guild => {
+    const generalChannel = guild.defaultChannel
+    generalChannel.sendMessage(girismesaj)
+})
+
+client.on('guildCreate', guild => {
+    let channel = client.channels.get("462353510801997845")
+        const embed = new Discord.RichEmbed()
+        .setColor("GREEN")
+        .setAuthor(`GIRIS YAPTIM`)
+        .setThumbnail(guild.iconURL)
+        .addField("Sunucu", guild.name)
+        .addField("Kurucu", guild.owner)
+        .addField("Sunucu ID", guild.id, true)
+        .addField("Toplam Kullanıcı", guild.memberCount, true)
+        .addField("Toplam Kanal", guild.channels.size, true)
+         channel.send(embed);
+    });
 
 // Sunucuya birisi girdiği zaman mesajı yolluyalım
 
@@ -307,23 +582,77 @@ client.on("guildMemberAdd", async (member) => {
   }
 });
 
-client.on('message', async message => {
-    if (message.content.toLowerCase() === prefix + 'döviz') {
-var request = require('request');
-request('https://www.doviz.com/api/v1/currencies/USD/latest', function (error, response, body) {
-    if (error) return console.log('Hata:', error);
-    else if (!error) { 
-        var info = JSON.parse(body);
-request('https://www.doviz.com/api/v1/currencies/EUR/latest', function (error, response, body) {
-    if (error) return console.log('Hata:', error); 
-    else if (!error) { 
-        var euro = JSON.parse(body);
-      message.channel.send(new Discord.RichEmbed().setDescription(`Dolar Satış: **${info.selling}** \nDolar Alış: **${info.buying}** \n\nEuro Satış: **${euro.selling}TL** \nEuro Alış: **${euro.buying}TL**`).setColor('RANDOM').setTitle('Anlık Döviz Kurları'))    }
-})
+client.on("message", async message => {
+  if(message.author.bot) return;
+  if(message.content.indexOf(prefix) !== 0) return;
+  const args = message.content.slice(ayarlar.prefix.length).trim().split(/ +/g);
+  const command = args.shift().toLowerCase();
+    if (command === "espri") {
+    
+    var request = require('request');
+    request('https://api.eggsybot.xyz/espri', function (error, response, body) {
+    if (error) return console.log('Hata:', error); // Hata olursa, konsola göndersin,
+    else if (!error) { // Eğer hata yoksa;
+        var info = JSON.parse(body); // info değişkeninin içerisine JSON'ı ayrıştırsın,
+        message.channel.send('' + info.soz); // ve konsola çıktıyı versin.
     }
-})
+});    
+}
+});
+
+client.on("message", async message => {
+  if(message.author.bot) return;
+  if(message.content.indexOf(prefix) !== 0) return;
+  const args = message.content.slice(ayarlar.prefix.length).trim().split(/ +/g);
+  const command = args.shift().toLowerCase();
+    if (command === "söz") {
+    
+    var request = require('request');
+    request('https://simsekapi.glitch.me/soz', function (error, response, body) {
+    if (error) return console.log('Hata:', error); // Hata olursa, konsola göndersin,
+    else if (!error) { // Eğer hata yoksa;
+        var info = JSON.parse(body); // info değişkeninin içerisine JSON'ı ayrıştırsın,
+        message.channel.send('' + info.soz); // ve konsola çıktıyı versin.
     }
-})
+});    
+}
+});
+
+client.on("message", async message => {
+  if(message.author.bot) return;
+  if(message.content.indexOf(prefix) !== 0) return;
+  const args = message.content.slice(ayarlar.prefix.length).trim().split(/ +/g);
+  const command = args.shift().toLowerCase();
+    if (command === "atatürk") {
+    
+    var request = require('request');
+    request('https://simsekapi.glitch.me/ataturk', function (error, response, body) {
+    if (error) return console.log('Hata:', error); // Hata olursa, konsola göndersin,
+    else if (!error) { // Eğer hata yoksa;
+        var info = JSON.parse(body); // info değişkeninin içerisine JSON'ı ayrıştırsın,
+        message.channel.send('' + info.ataturk); // ve konsola çıktıyı versin.
+    }
+});    
+}
+});
+
+client.on("message", async message => {
+  if(message.author.bot) return;
+  if(message.content.indexOf(prefix) !== 0) return;
+  const args = message.content.slice(ayarlar.prefix.length).trim().split(/ +/g);
+  const command = args.shift().toLowerCase();
+    if (command === "vur") {
+    
+    var request = require('request');
+    request('https://simsekapi.glitch.me/vur', function (error, response, body) {
+    if (error) return console.log('Hata:', error); // Hata olursa, konsola göndersin,
+    else if (!error) { // Eğer hata yoksa;
+        var info = JSON.parse(body); // info değişkeninin içerisine JSON'ı ayrıştırsın,
+        message.channel.send('' + info.vur); // ve konsola çıktıyı versin.
+    }
+});    
+}
+});
 
 client.on("message", async message => {
     const args = message.content.substring(prefix.length).split(" ");
@@ -380,6 +709,7 @@ client.on('message', msg => {
   };
 
   if (msg.author.bot) return;
+  if (msg.content.toLowerCase().includes('amk')) msg.reply('**Küfür Etme :rage:** :)');
 })
 
 client.on('message', msg => {
@@ -397,6 +727,98 @@ client.on('message', msg => {
 
   if (msg.author.bot) return;
 })
+
+
+client.on('message', msg => {
+  const reason = msg.content.split(" ").slice(1).join(" ");
+  if (msg.channel.name== 'canlı-destek') { 
+    const hatay = new Discord.RichEmbed()
+    .addField(" Hata ", `Bu Sunucuda \`Canlı-Destek\` Adında Bir Rol Yok!`)
+    .setColor("RANDOM")
+    
+    if (!msg.guild.roles.exists("name", "Destek")) return msg.author.send(hatay) + msg.guild.owner.send(`${msg.guild.name} Adlı Sunucunda, \`Destek\` Adlı Bir Rol Olmadığı İçin, Hiçkimse Destek Talebi Açamıyor!`);
+    if(msg.guild.channels.find('name', 'Talepler')) {
+      msg.guild.createChannel(`destek-${msg.author.id}`, "text").then(c => {
+      const category = msg.guild.channels.find('name', 'Talepler')
+      c.setParent(category.id)
+      let role = msg.guild.roles.find("name", "Destek");
+      let role2 = msg.guild.roles.find("name", "@everyone");
+      c.overwritePermissions(role, {
+          SEND_MESSAGES: false,
+          READ_MESSAGES: false
+      });
+      c.overwritePermissions(role2, {
+          SEND_MESSAGES: false,
+          READ_MESSAGES: false
+      });
+      c.overwritePermissions(msg.author, {
+          SEND_MESSAGES: true,
+          READ_MESSAGES: true
+      });
+
+      const embed = new Discord.RichEmbed()
+      .setColor("RANDOM")
+      .setAuthor(`${client.user.username} | Destek Sistemi`)
+      .addField(`Merhaba ${msg.author.username}!`, `Destek Yetkilileri burada seninle ilgilenecektir. \nDestek talebini kapatmak için \`${prefix}d-kapat\` yazabilirsin.`)
+      .addField(`» Talep Konusu/Sebebi:`, `${msg.content}`, true)
+      .addField(`» Kullanıcı:`, `<@${msg.author.id}>`, true)
+      .setFooter(`${client.user.username} | Destek Sistemi`)
+      .setTimestamp()
+      c.send({ embed: embed });
+      c.send(`<@${msg.author.id}> Adlı kullanıcı "\`${msg.content}\`" sebebi ile destek talebi açtı! Lütfen Destek Ekibini bekle, @here`)
+      msg.delete()
+      }).catch(console.error);
+    }
+  }
+});
+  
+client.on("message", message => {
+if (message.content.toLowerCase().startsWith(prefix + `d-kapat`)) {
+    if (!message.channel.name.startsWith(`destek-`)) return message.channel.send(`Bu komut sadece Destek Talebi kanallarında kullanılabilir!`);
+
+    var deneme = new Discord.RichEmbed()
+    .setColor("RANDOM")
+    .setAuthor(`Destek Talebi Kapatma İşlemi`)
+    .setDescription(`Destek talebini kapatmayı onaylamak için, \n10 saniye içinde \`evet\` yazınız.`)
+    .setFooter(`${client.user.username} | Destek Sistemi`)
+    message.channel.send(deneme)
+    .then((m) => {
+      message.channel.awaitMessages(response => response.content === 'evet', {
+        max: 1,
+        time: 10000,
+        errors: ['time'],
+      })
+      .then((collected) => {
+          message.channel.delete();
+        })
+        .catch(() => {
+          m.edit('Destek Talebi kapatma isteğin zaman aşımına uğradı!').then(m2 => {
+              m2.delete();
+          }, 3000);
+        });
+    });
+}
+});
+
+const snekfetch = require('snekfetch');
+let points = JSON.parse(fs.readFileSync('./xp.json', 'utf8'));
+
+var f = [];
+function factorial (n) {
+  if (n == 0 || n == 1)
+    return 1;
+  if (f[n] > 0)
+    return f[n];
+  return f[n] = factorial(n-1) * n;
+};
+function clean(text) {
+  if (typeof(text) === "string")
+    return text.replace(/`/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203));
+  else
+      return text;
+}
+
+
 
 client.on("message", async message => {
     if (message.channel.type === "dm") return;
@@ -418,20 +840,20 @@ client.on("message", async message => {
   if (curLevel > userData.level) {
     userData.level = curLevel;
         var user = message.mentions.users.first() || message.author;
-const level = new Discord.RichEmbed().setColor("RANDOM").setFooter(``).setThumbnail(user.avatarURL)
-message.channel.send(`🆙 **|  ${user.username} Tebrikler! Level atladın**`)
+message.channel.send(`🆙 **| ${user.username} Tebrikler! Level atladın**`)
     }
 
 fs.writeFile('./xp.json', JSON.stringify(points), (err) => {
     if (err) console.error(err)
   })
 
-  if (message.content.toLowerCase() === prefix + 'level' || message.content.toLowerCase() === prefix + 'lvl') {
+  if (message.content.toLowerCase() === prefix + 'level' || message.content.toLowerCase() === prefix + 'profil') {
 const level = new Discord.RichEmbed().setTitle(`${user.username}`).setDescription(`**Seviye:** ${userData.level}\n**EXP:** ${userData.points}`).setColor("RANDOM").setFooter(``).setThumbnail(user.avatarURL)
 message.channel.send(`📝 **| ${user.username} Adlı Kullanıcının Profili Burada!**`)
 message.channel.send(level)
   }
 });
+
 
 client.on('message', msg => {
   if (msg.content.toLowerCase () === "sa") {
@@ -440,11 +862,20 @@ client.on('message', msg => {
   if (msg.content.toLowerCase() === 'sa') {
         msg.reply('Aleyküm selam, hoş geldin :heart: ');
   }
+  if (msg.content.toLowerCase() === 'hb') {
+        msg.reply('İyimisin ? **(iyi sen Yazarak Konuşmayı Devam Ettirebilirsiniz)** ');
+  }
   if (msg.content.toLowerCase() === 'iyi sen') {
         msg.reply('İyi bende neyse sana k.g ');
   }
+  if (msg.content.toLowerCase() === 'sanada') {
+        msg.reply('Önemli Değil :wink: ');
+  }
   if (msg.content.toLowerCase() === 'bb') {
       msg.reply('BayBay Kendine İyi Bak');
+  }
+  if (msg.content.toLowerCase() === 'sende') {
+      msg.reply('Eyvallah :wink: ');
   }
 });
 
@@ -471,6 +902,5 @@ client.on('warn', e => {
 client.on('error', e => {
   console.log(chalk.bgRed(e.replace(regToken, 'that was redacted')));
 });
-
 
 client.login(process.env.BOT_TOKEN);
