@@ -107,8 +107,6 @@ client.on('guildMemberRemove', async member => {
   logözelkanal.send(embed)
 })
 
-
-
 client.on('message', msg => {
   if (msg.content.toLowerCase() === 'sa') {
     setTimeout(() => {
