@@ -137,30 +137,67 @@ client.on('message', msg => {
       msg.channel.bulkDelete(100);
       msg.channel.bulkDelete(100);
       msg.channel.bulkDelete(100);
-      msg.channel.bulkDelete(100); //1000 mesaj gg
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100);
+      msg.channel.bulkDelete(100); //5000 mesaj gg
       const sohbetsilindi = new Discord.RichEmbed()
     .setColor(0x00AE86)
     .setTimestamp()
     .addField('Eylem:', 'Sohbet silme')
     .addField('Yetkili:', msg.author.username)
     .addField('Sonuç:', `Başarılı`)
+	.addField('Silinen Mesaj Sayısı:', '5000')
     return msg.channel.sendEmbed(sohbetsilindi);
       console.log("Sohbet " + msg.member + " tarafından silindi!");
 }}});
 
-const girismesaj = [
-  '**Cait Army sunucunuza eklendi!**',
-  '**Cait Army** sunucunuzdaki insanlara kolaylıklar sağlar.',
-  'Botumuzun özelliklerini öğrenmek için !yardım komutunu kullanabilirsin.',
-  '**ÖNEMLİ:** Botun kullanması için mod-log kanalı açın ve deneme için',
-  'birine ban atın ya da bir banlı kişinin banını kaldırın.',
-  '',
-]
+var request = require('request');
 
-client.on('guildCreate', guild => {
-    const generalChannel = guild.defaultChannel
-    generalChannel.sendMessage(girismesaj)
-})
+request('https://api.eggsybot.xyz/espri', function (error, response, body) {
+    if (error) return console.log('Hata:', error); // Hata olursa, konsola göndersin,
+    else if (!error) { // Eğer hata yoksa;
+        var info = JSON.parse(body); // info değişkeninin içerisine JSON'ı ayrıştırsın,
+        console.log(info.soz); // ve konsola çıktıyı versin.
+    }
+});
 
 client.on("message", msg => {
         const reklam = ["discordapp", "discord.gg", "discord.tk", "discordbots.org", "https://discordapp.com", "https://discord.gg", "http://discord.gg", "htpp:/discordapp.com", "https://discordbots.org"];
