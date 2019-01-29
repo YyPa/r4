@@ -6,7 +6,6 @@ const fs = require('fs');
 const queue = new Map();  
 let xp = require("./xp.json");
 const moment = require('moment');
-const antispam = require("discord-anti-spam-tr");
 require('./util/eventLoader')(client);
 
 var prefix = ayarlar.prefix;
