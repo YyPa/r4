@@ -343,7 +343,6 @@ client.on('message', msg => {
   };
 
   if (msg.author.bot) return;
-  if (msg.content.toLowerCase().includes('amk')) msg.reply('**Küfür Etme :rage:** :)');
 })
 
 client.on('message', msg => {
@@ -404,20 +403,11 @@ client.on('message', msg => {
   if (msg.content.toLowerCase() === 'sa') {
         msg.reply('Aleyküm selam, hoş geldin :heart: ');
   }
-  if (msg.content.toLowerCase() === 'hb') {
-        msg.reply('İyimisin ? **(iyi sen Yazarak Konuşmayı Devam Ettirebilirsiniz)** ');
-  }
   if (msg.content.toLowerCase() === 'iyi sen') {
         msg.reply('İyi bende neyse sana k.g ');
   }
-  if (msg.content.toLowerCase() === 'sanada') {
-        msg.reply('Önemli Değil :wink: ');
-  }
   if (msg.content.toLowerCase() === 'bb') {
       msg.reply('BayBay Kendine İyi Bak');
-  }
-  if (msg.content.toLowerCase() === 'sende') {
-      msg.reply('Eyvallah :wink: ');
   }
 });
 
