@@ -5,7 +5,6 @@ const chalk = require('chalk');
 const fs = require('fs');
 const { GOOGLE_API_KEY } = require('./anahtarlar.json');
 const queue = new Map();  
-const ytdl = require('ytdl-core');
 let xp = require("./xp.json");
 const moment = require('moment');
 const antispam = require("discord-anti-spam-tr");
